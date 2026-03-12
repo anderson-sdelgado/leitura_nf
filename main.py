@@ -15,9 +15,8 @@ if __name__ == "__main__":
         if "DANFSev1.0" in texto:
             leitura_danfse(arquivo)
         elif "Exigibilidade ISSQN" in texto:
-        #     # leitura_giss(pymupedf)
             leitura_giss(texto)
-        # # elif "Prefeitura Municipal de Pontal" in pymupedf and  "Nome/Razão Social" in texto_inicio:
-        # #     leitura_municipio_pontal(pdfplumber)
-        # else:
-        #     leitura_desconhecida(texto)
+        elif "Prefeitura Municipal de Pontal" in texto and "Exigibilidade do ISS" in texto:
+            leitura_municipio_pontal(texto)
+        else:
+            leitura_desconhecida(texto)
