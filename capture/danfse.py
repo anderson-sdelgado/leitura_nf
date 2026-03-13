@@ -60,10 +60,10 @@ def leitura_danfse(arquivo: str):
     nota["COD_SERVICO"] = codigo_servico # Código do serviço. Idem V_NF_SERV.
     nota["COD_SERVICO_ORIGINAL"] = desc_servico_completa # Código do serviço - informação original. Idem V_NF_SERV.
 
-    # print("----------- NOTA DANF-----------")
-    # for chave, valor in nota.items():
-    #     print(f"{chave}: {valor}")
-    # print("--------------------------")
+    print("----------- NOTA DANF-----------")
+    for chave, valor in nota.items():
+        print(f"{chave}: {valor}")
+    print("--------------------------")
     
     # print("----------- NOTA DANF-----------")
     # for numero, linha in enumerate(linhas, start=1): 

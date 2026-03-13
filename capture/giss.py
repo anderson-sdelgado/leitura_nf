@@ -1,7 +1,6 @@
 import re
 from lib.limpar_cnpj import limpar_cnpj
 from lib.converter_moeda import extrair_valor
-from lib.leitura_arquivo import ler_pymupedf
 
 def limpar_linha(linha):
     return re.sub(r'^\d+:\s*', '', linha).strip()
@@ -59,10 +58,10 @@ def leitura_giss(texto: str):
     nota["COD_SERVICO"] = servico["codigo"] # Código do serviço. Idem V_NF_SERV.
     nota["COD_SERVICO_ORIGINAL"] = servico["descricao_completa"] # Código do serviço - informação original. Idem V_NF_SERV.
 
-    # print("----------- NOTA GISS -----------")
-    # for chave, valor in nota.items():
-    #     print(f"{chave}: {valor}")
-    # print("-----------------------------------")
+    print("----------- NOTA GISS -----------")
+    for chave, valor in nota.items():
+        print(f"{chave}: {valor}")
+    print("-----------------------------------")
 
 def pegar_prefeitura(linhas):
     for linha in linhas:
