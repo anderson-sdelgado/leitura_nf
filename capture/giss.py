@@ -29,7 +29,7 @@ def leitura_giss(texto: str):
     nota["SERIE"] = "A" # Série do documento fiscal para registro. Fixo "A".
     nota["DTINSERT"] = None # Data da inclusão no SE Suite. Idem V_NF_SERV.
     nota["DTUPDATE"] = None # Data da alteração no SE Suite. Idem V_NF_SERV.
-#     nota["ID_DOC"] = pegar_codigo_verificacao(linhas) # ID do documento na view. Idem V_NF_SERV.
+    nota["ID_DOC"] = None # ID do documento na view. Idem V_NF_SERV.
     nota["PREFEIT"] = pegar_prefeitura(linhas) # Nome da prefeitura. Idem V_NF_SERV.
     nota["SECRET_PREFEIT"] = pegar_secretaria(linhas) # Secretaria da prefeitura. Idem V_NF_SERV.
     nota["NRO_NF"] = pegar_numero_nf(linhas) # Número da NF. Idem V_NF_SERV.

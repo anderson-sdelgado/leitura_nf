@@ -9,4 +9,4 @@ def extrair_valor(texto):
     try:
         return float(valor)
     except:
-        return None
+        return None 
