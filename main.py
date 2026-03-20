@@ -12,6 +12,9 @@ from capture.issweb import leitura_issweb
 from capture.municipo_sorocaba import leitura_municipio_sorocaba
 from capture.giss_xml import leitura_xml_giss
 from capture.municipio_barueri import leitura_municipio_barueri
+from capture.municipio_sao_jose_do_rio_preto import leitura_municipio_sao_jose_do_rio_preto
+from capture.lck_ibitinga import leitura_lck
+from capture.primaxonline import leitura_primax
 
 if __name__ == "__main__":
     arquivos_pdf = listar_arquivos("download")
@@ -26,7 +29,6 @@ if __name__ == "__main__":
             # leitura_xml_giss(arquivo)
             continue # Vai para o próximo arquivo
 
-        # CASO 2: PDF (Sua lógica original)
         elif nome_arquivo.endswith(".pdf"):
             texto = ler_pdfplumber(arquivo)
 
@@ -36,9 +38,16 @@ if __name__ == "__main__":
                 # print(f"Pulando arquivo devido a erro de leitura: {arquivo}")
                 continue
 
+            if "DANFSe v1.0" in texto:
+                ...
+                # print("1")
+                # print(arquivo)
+                leitura_danfse(texto, arquivo)
             if "DANFSev1.0" in texto:
                 ...
-                # leitura_danfse(arquivo)
+                # print("2")
+                # print(arquivo)
+                leitura_danfse(texto, arquivo)
             elif "Exigibilidade ISSQN" in texto:
                 ...
                 # leitura_giss(texto)
@@ -50,14 +59,10 @@ if __name__ == "__main__":
                 # leitura_senior(texto)
             elif "ginfes.com.br" in texto:
                 ...
-                # print(arquivo)
                 # leitura_ginfes(texto)
             elif "/issweb" in texto:
                 ...
-                # print(arquivo)
                 # leitura_issweb(texto)
-            elif "DESCRIÇÃO DO SERVIÇO PRESTADO (EM ACORDO COM A CNAE/CBO" in texto:
-                ...
             elif "Prefeitura Municipal de Pontal" in texto and "Exigibilidade do ISS" in texto:
                 ...
                 # leitura_municipio_pontal(texto)
@@ -69,8 +74,16 @@ if __name__ == "__main__":
                 # leitura_municipio_sorocaba(texto)
             elif "http://www.barueri.sp.gov.br/nfe" in texto:
                 ...
-                leitura_municipio_barueri(texto)
+                # leitura_municipio_barueri(texto)
+            elif "SÃO JOSÉ DO RIO PRETO " in texto:
+                ...
+                # leitura_municipio_sao_jose_do_rio_preto(texto)
+            elif "LCK Consultoria e Sistemas" in texto:
+                ...
+                # leitura_lck(texto)
+            elif "www.primaxonline.com.br" in texto:
+                ...
+                # leitura_primax(texto)
             else:
                 ...
-                # print(arquivo)
                 # leitura_desconhecida(texto)

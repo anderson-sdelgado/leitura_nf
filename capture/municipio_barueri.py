@@ -62,19 +62,6 @@ def leitura_municipio_barueri(texto: str):
         print(f"{chave}: {valor}")
     print("--------------------------------------")
 
-def pegar_prefeitura(linhas):
-    for linha in linhas:
-        match = re.search(r'(PREFEITURA\s+.*?)(?:\s{2,}|$)', linha)
-        if match:
-            return match.group(1).strip()
-    return None
-
-def pegar_secretaria(linhas):
-    for linha in linhas:
-        if "SECRETARIA" in linha.upper():
-            return linha.strip()
-    return None
-
 def pegar_autenticidade(linhas):
     texto_topo = " ".join(linhas[:15])
     padrao = r'[0-9A-Z]{4}\.[0-9A-Z]{4}\.[0-9A-Z]{4}\.[0-9A-Z]{7}-[A-Z0-9]'
@@ -87,6 +74,19 @@ def pegar_autenticidade(linhas):
             match_flex = re.search(r'[0-9A-Z]{4}\.[0-9A-Z.]+', parte_apos)
             if match_flex:
                 return match_flex.group(0).strip()
+    return None
+
+def pegar_prefeitura(linhas):
+    for linha in linhas:
+        match = re.search(r'(PREFEITURA\s+.*?)(?:\s{2,}|$)', linha)
+        if match:
+            return match.group(1).strip()
+    return None
+
+def pegar_secretaria(linhas):
+    for linha in linhas:
+        if "SECRETARIA" in linha.upper():
+            return linha.strip()
     return None
 
 def pegar_numero_nf(linhas):

@@ -5,6 +5,11 @@ from lib.converter_moeda import extrair_valor
 def leitura_municipio_pontal(texto: str):
     linhas = [linha.strip() for linha in texto.splitlines() if linha.strip()]
 
+    # print("----------- NOTA PONTAL -----------")
+    # for numero, linha in enumerate(linhas, start=1): 
+    #     print(f"{linha}")
+    # print("-------------------------")
+
     prestador = pegar_dados_prestador(texto)
     tomador = pegar_dados_tomador(texto)
     pis, cofins, irrf, inss, csll = pegar_tributos_retidos(texto)
@@ -56,10 +61,6 @@ def leitura_municipio_pontal(texto: str):
     return nota
     print("-----------------------------------")
 
-    # print("----------- NOTA PONTAL -----------")
-    # for numero, linha in enumerate(linhas, start=1): 
-    #     print(f"{linha}")
-    # print("-------------------------")
 
 def pegar_numero_nf(texto):
     match = re.search(r'Número da NFS-e\s+(\d+)', texto)
