@@ -12,7 +12,7 @@ def ler_pdfplumber(caminho_pdf: str) -> str:
     except Exception as e:
         print("Erro ao ler PDF lumber: ", e)
         return None
-    
+
 def ler_pymupedf(caminho_pdf: str) -> str:
     try:
         texto = ""

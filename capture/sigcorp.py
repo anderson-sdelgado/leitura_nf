@@ -2,7 +2,7 @@ import re
 from lib.limpar_cnpj import limpar_cnpj
 from lib.converter_moeda import extrair_valor
 
-def leitura_municipio_sao_jose_do_rio_preto(texto: str):
+def leitura_sgicorp(texto: str):
     linhas = texto.splitlines()
 
     # print("----------- NOTA SAO JOSE DO RIO PRETO -----------")

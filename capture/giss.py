@@ -6,17 +6,15 @@ def limpar_linha(linha):
     return re.sub(r'^\d+:\s*', '', linha).strip()
 
 def leitura_giss(texto: str):
-    linhas = texto.splitlines()
         
     # print("----------- NOTA GISS -----------")
-    # for numero, linha in enumerate(linhas, start=1): 
-    #     print(f"{linha}")
+    # print(texto)
     # print("-------------------------")
 
-    prestador = pegar_dados_prestador(linhas)
-    tomador = pegar_dados_tomador(linhas)
-    tributos = pegar_tributos_federais(linhas)
-    servico = pegar_atividade_economica(linhas)
+    prestador = pegar_dados_prestador(texto)
+    tomador = pegar_dados_tomador(texto)
+    financeiro = pegar_valores(texto)
+    servico = pegar_dados_servico(texto)
 
     nota = {}
     nota["DT_HR_INCL"] = None # Data e hora da inclusão da linha.
@@ -29,32 +27,32 @@ def leitura_giss(texto: str):
     nota["SERIE"] = "A" # Série do documento fiscal para registro. Fixo "A".
     nota["DTINSERT"] = None # Data da inclusão no SE Suite. Idem V_NF_SERV.
     nota["DTUPDATE"] = None # Data da alteração no SE Suite. Idem V_NF_SERV.
-    nota["ID_DOC"] = None # ID do documento na view. Idem V_NF_SERV.
-    nota["PREFEIT"] = pegar_prefeitura(linhas) # Nome da prefeitura. Idem V_NF_SERV.
-    nota["SECRET_PREFEIT"] = pegar_secretaria(linhas) # Secretaria da prefeitura. Idem V_NF_SERV.
-    nota["NRO_NF"] = pegar_numero_nf(linhas) # Número da NF. Idem V_NF_SERV.
-    nota["DT_EMISS"] = pegar_data_hora_emissao(linhas) # Data de emissão da NF. Idem V_NF_SERV.
+    nota["ID_DOC"] = pegar_codigo_verificacao(texto) # ID do documento na view. Idem V_NF_SERV.
+    nota["PREFEIT"] = pegar_prefeitura(texto) # Nome da prefeitura. Idem V_NF_SERV.
+    nota["SECRET_PREFEIT"] = pegar_secretaria(texto) # Secretaria da prefeitura. Idem V_NF_SERV.
+    nota["NRO_NF"] = pegar_numero_nf(texto) # Número da NF. Idem V_NF_SERV.
+    nota["DT_EMISS"] = pegar_data_hora_emissao(texto) # Data de emissão da NF. Idem V_NF_SERV.
     nota["PS_RAZ_SOC_NOME"] = prestador['razao_social'] # Nome do prestador de serviço. Idem V_NF_SERV.
     nota["PS_CNPJ_CPF"] = prestador['cnpj'] # CNPJ do prestador de serviço. Idem V_NF_SERV.
     nota["PS_INSC_MUNIC"] = prestador['inscricao'] # Inscrição municipal do prestador de serviço. Idem V_NF_SERV.
     nota["PS_INSC_EST"] = None # Inscrição estadual do prestador de serviço. Idem V_NF_SERV.
     nota["PS_MUNIC"] = prestador['municipio'] # Nome do município do prestador de serviço. Idem V_NF_SERV.
     nota["PS_UF"] = prestador['uf'] # Sigla da UF do prestador de serviço. Idem V_NF_SERV.
-    nota["PS_ENDERECO"] = prestador['endereco_completo'] # Endereço do prestador de serviço. Idem V_NF_SERV.
+    nota["PS_ENDERECO"] = prestador['endereco'] # Endereço do prestador de serviço. Idem V_NF_SERV.
     nota["PS_BAIRRO"] = prestador['bairro'] # Bairro do prestador de serviço. Idem V_NF_SERV.
     nota["PS_CEP"] = prestador['cep'] # CEP do prestador de serviço. Idem V_NF_SERV.
     nota["PS_EMAIL"] = prestador['email'] # E-mail do prestador de serviço. Idem V_NF_SERV.
     nota["TS_RAZ_SOC_NOME"] = tomador['razao_social'] # Nome do tomador de serviço - empresa usuária. Idem V_NF_SERV.
     nota["TS_CNPJ_CPF"] = tomador['cnpj'] # CNPJ do tomador de serviço - empresa usuária. Idem V_NF_SERV.
-    nota["DESC_SERV"] = pegar_discriminacao_servico(linhas) # Descrição do serviço. Idem V_NF_SERV.
-    nota["VL_BRUTO"] = extrair_valor(pegar_valor_servico(linhas)) # Valor bruto. Idem V_NF_SERV.
-    nota["VL_LIQ"] = extrair_valor(pegar_valor_liquido(linhas)) # Valor líquido. Idem V_NF_SERV.
-    nota["VL_PIS"] = extrair_valor(tributos["pis"]) # Valor do PIS. Idem V_NF_SERV.
-    nota["VL_COFINS"] = extrair_valor(tributos["cofins"]) # Valor da Cofins. Idem V_NF_SERV.
-    nota["VL_IR"] = extrair_valor(tributos["ir"]) # Valor do IR. Idem V_NF_SERV.
-    nota["VL_INSS"] = extrair_valor(tributos["inss"]) # Valor do INSS. Idem V_NF_SERV.
-    nota["VL_CSLL"] = extrair_valor(tributos["csll"]) # Valor da CSLL. Idem V_NF_SERV.
-    nota["VL_ISS"] = extrair_valor(pegar_issqn(linhas)) # Valor do ISS. Idem V_NF_SERV.
+    nota["DESC_SERV"] = pegar_discriminacao_servico(texto) # Descrição do serviço. Idem V_NF_SERV.
+    nota["VL_BRUTO"] = extrair_valor(financeiro["bruto"]) # Valor bruto. Idem V_NF_SERV. 
+    nota["VL_LIQ"] = extrair_valor(financeiro["liquido"]) # Valor líquido. Idem V_NF_SERV.
+    nota["VL_PIS"] = extrair_valor(financeiro["pis"]) # Valor do PIS. Idem V_NF_SERV.
+    nota["VL_COFINS"] = extrair_valor(financeiro["cofins"]) # Valor da Cofins. Idem V_NF_SERV.
+    nota["VL_IR"] = extrair_valor(financeiro["ir"]) # Valor do IR. Idem V_NF_SERV.
+    nota["VL_INSS"] = extrair_valor(financeiro["inss"]) # Valor do INSS. Idem V_NF_SERV.
+    nota["VL_CSLL"] = extrair_valor(financeiro["csll"]) # Valor da CSLL. Idem V_NF_SERV.
+    nota["VL_ISS"] = extrair_valor(financeiro["iss"]) # Valor do ISS. Idem V_NF_SERV.
     nota["COD_SERVICO"] = servico["codigo"] # Código do serviço. Idem V_NF_SERV.
     nota["COD_SERVICO_ORIGINAL"] = servico["descricao_completa"] # Código do serviço - informação original. Idem V_NF_SERV.
 
@@ -63,209 +61,233 @@ def leitura_giss(texto: str):
         print(f"{chave}: {valor}")
     print("-----------------------------------")
 
-def pegar_prefeitura(linhas):
-    for linha in linhas:
-        match = re.search(r'(PREFEITURA\s+.*?)(?:\s{2,}|$)', linha)
-        if match:
-            return match.group(1).strip()
-    return None
+def pegar_prefeitura(texto):
+    padrao = (
+        r'\s*(.*?)\s*'
+        r'NFS-e'
+    )
+    match = re.search(padrao, texto, re.IGNORECASE | re.S)
+    if not match: return None
+    return match.group(1).strip()
 
-def pegar_secretaria(linhas):
-    for linha in linhas:
-        if "SECRETARIA" in linha.upper():
-            return linha.strip()
-    return None
+def pegar_secretaria(texto):
+    padrao = r'(SECRETARIA.*?)\s*C[oõóòô]digo'
+    match = re.search(padrao, texto, re.IGNORECASE | re.S)
+    if not match: return None
+    return match.group(1).strip()
 
-def pegar_numero_nf(linhas):
-    proxima_e_numero = False
-    for linha in linhas:
-        linha_limpa = linha.strip()
-        if proxima_e_numero and linha_limpa:
-            match = re.search(r'(\d+)', linha_limpa)
-            if match:
-                return match.group(1)
-        if "NFS-e" in linha:
-            match_mesma_linha = re.search(r'NFS-e\s+(\d+)', linha)
-            if match_mesma_linha:
-                return match_mesma_linha.group(1)
-            proxima_e_numero = True
-    return None
+def pegar_codigo_verificacao(texto):
+    padrao = (
+        r'ELETR[OÔ]NICA'
+        r'\s*(.*?)\s*'
+        r'Emiss[aãáàâ]o'
+    )
+    match = re.search(padrao, texto, re.IGNORECASE | re.S)
+    if not match: return None
+    conteudo = match.group(1).strip()
+    padrao = r'\b[A-Z0-9]{9}\b'
+    matches = re.findall(padrao, conteudo.upper())
+    codigos_filtrados = [m for m in matches if not m.isdigit()]
+    return codigos_filtrados[0]
 
-def pegar_data_hora_emissao(linhas):
-    pular_para_proxima = False
-    for linha in linhas:
-        linha_limpa = linha.strip()
-        if pular_para_proxima and linha_limpa:
-            match = re.search(r'(\d{2}/\d{2}/\d{4}\s+\d{2}:\d{2}:\d{2})', linha_limpa)
-            if match:
-                return match.group(1)
-        if "Emissão da NFS-e" in linha:
-            pular_para_proxima = True
-    return None
+def pegar_numero_nf(texto):
+    padrao = r'NFS-e'r'\s*(.*)$'
+    match = re.search(padrao, texto, re.IGNORECASE | re.M)
+    if not match: return None
+    return match.group(1).strip()
 
-def pegar_dados_prestador(linhas):
-    dentro_secao_prestador = False
+def pegar_data_hora_emissao(texto):
+    padrao = (
+        r'Emiss[aãáàâ]o\s*'
+        r'\s*(.*?)\s*'
+        r'RPS'
+    )
+    match = re.search(padrao, texto, re.IGNORECASE | re.S)
+    if not match: return None
+    conteudo = match.group(1).strip()
+    match = re.search(r'(\d{2}/\d{2}/\d{4}\s+\d{2}:\d{2})', conteudo)
+    if not match: return None
+    return match.group(1)
+
+def pegar_dados_prestador(texto):
     dados = {
         "razao_social": None, 
         "cnpj": None, 
-        "inscricao": None, # Agora será preenchido
+        "inscricao": None,
         "municipio": None,
         "uf": None,
-        "endereco_completo": None,
+        "endereco": None,
         "bairro": None,
         "cep": None,
         "email": None 
     }
-    rua, numero, complemento = "", "", ""
-    for linha in linhas:
-        if "Prestador de Serviço" in linha:
-            dentro_secao_prestador = True
-            continue
-        if dentro_secao_prestador:
-            # E-mail
-            if "E-mail:" in linha:
-                match_email = re.search(r'E-mail:\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})', linha)
-                dados["email"] = match_email.group(1).strip() if match_email else None
-            
-            # CPF/CNPJ e INSCRIÇÃO (Correção aqui)
-            if "CPF/CNPJ:" in linha:
-                match_cnpj = re.search(r'CPF/CNPJ:\s*([\d./-]+)', linha)
-                if match_cnpj: dados["cnpj"] = match_cnpj.group(1).strip()
-                
-                match_insc = re.search(r'Inscrição\s+([\w.-]+)', linha) # Pega a inscrição municipal
-                if match_insc: dados["inscricao"] = match_insc.group(1).strip()
+    padrao = (
+        r'Prestador\s*de\s*Servi[cç]o'
+        r'\s*(.*?)\s*'
+        r'Tomador\s*de\s*Servi[cç]o'
+    )
+    match = re.search(padrao, texto, re.IGNORECASE | re.S)
+    if not match: return dados
 
-            # CEP, Município e UF
-            if "CEP:" in linha:
-                match_cep = re.search(r'CEP:\s*([\d-]{8,9})', linha)
-                if match_cep: dados["cep"] = match_cep.group(1).strip()
-            if "Município:" in linha:
-                match_mun = re.search(r'Município:\s*(.*?)(?=\s+UF:|$)', linha)
-                if match_mun: dados["municipio"] = match_mun.group(1).strip()
-                match_uf = re.search(r'UF:\s*([A-Z]{2})', linha)
-                if match_uf: dados["uf"] = match_uf.group(1).strip()
+    bloco_completo = match.group(1).strip()
 
-            # Bairro e Endereço
-            if "Bairro:" in linha:
-                dados["bairro"] = linha.split("Bairro:")[1].strip()
-            if "Endereço" in linha:
-                match_rua = re.search(r'Endereço[:\s]+(.*?)(?=\s+Número:|$)', linha)
-                if match_rua: rua = match_rua.group(1).strip()
-            if "Número:" in linha:
-                match_num = re.search(r'Número:\s*([\w\s/.-]+?)(?=\s{2,}|Bairro:|$)', linha)
-                if match_num: numero = match_num.group(1).strip()
-            if "Complemento:" in linha:
-                match_comp = re.search(r'Complemento:\s*(.*?)(?=\s{2,}|Bairro:|$)', linha)
-                if match_comp: complemento = match_comp.group(1).strip()
-            
-            if "Nome/Razão Social:" in linha:
-                dados["razao_social"] = linha.split("Nome/Razão Social:")[1].strip()
-            
-            if "Tomador de Serviço" in linha:
-                break
+    padrao = r'Nome/Raz[aâãáà]o\s*Social:\s*(.*)$'
+    match = re.search(padrao, bloco_completo, re.IGNORECASE | re.M)
+    if match: dados["razao_social"] = match.group(1).strip()
 
-    partes = [rua, numero]
-    if complemento: partes.append(complemento)
-    dados["endereco_completo"] = ", ".join([p for p in partes if p])
+    padrao = r'CPF/CNPJ:\s*(.*?)\s*Inscri[cç][aâãáà]o'
+    match = re.search(padrao, bloco_completo, re.IGNORECASE | re.S)
+    if match: dados["cnpj"] = match.group(1).strip()
+
+    padrao = r'Inscri[cç][aâãáà]o\s*(.*?)\s*Nome/Raz[aâãáà]o\s*Social'
+    match = re.search(padrao, bloco_completo, re.IGNORECASE | re.S)
+    if match: dados["inscricao"] = match.group(1).strip()
+
+    padrao = r'Endere[cç]o\s*(.*?)\s*N[uú]mero'
+    match = re.search(padrao, bloco_completo, re.IGNORECASE | re.S)
+    if match: endereco = match.group(1).strip()
+
+    padrao = r'N[uú]mero:\s*(.*?)\s*Complemento'
+    match = re.search(padrao, bloco_completo, re.IGNORECASE | re.S)
+    if match: num = match.group(1).strip()
+
+    padrao = r'Complemento:\s*(.*?)\s*Bairro'
+    match = re.search(padrao, bloco_completo, re.IGNORECASE | re.S)
+    if match: complemento = match.group(1).strip()
+
+    partes = [item for item in [endereco, num, complemento] if item and str(item).strip()]
+    dados['endereco'] = ", ".join(partes)
+
+    padrao = r'Bairro:\s*(.*?)\s*CEP'
+    match = re.search(padrao, bloco_completo, re.IGNORECASE | re.S)
+    if match: dados['bairro'] = match.group(1).strip()
+
+    match = re.search(r'CEP:\s*([\d-]{8,9})', bloco_completo)
+    if match: dados["cep"] = match.group(1).strip()
+
+    padrao = r'Munic[ií]pio:\s*(.*?)\s*UF'
+    match = re.search(padrao, bloco_completo, re.IGNORECASE | re.S)
+    if match: dados['municipio'] = match.group(1).strip()
+
+    match = re.search(r'UF:\s*([A-Z]{2})', bloco_completo)
+    if match: dados["uf"] = match.group(1).strip()
+
+    match = re.search(r'E-mail:\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})', bloco_completo)
+    if match: dados["email"] = match.group(1).strip()
+
     return dados
 
-def pegar_dados_tomador(linhas):
-    dentro_secao_tomador = False
+def pegar_dados_tomador(texto):
     dados = {
         "razao_social": None,
         "cnpj": None
     }
-    for linha in linhas:
-        if "Tomador de Serviço" in linha:
-            dentro_secao_tomador = True
-            continue
-        if dentro_secao_tomador:
-            if "CPF/CNPJ:" in linha:
-                match_cnpj = re.search(r'CPF/CNPJ:\s*([\d./-]+)', linha)
-                if match_cnpj:
-                    dados["cnpj"] = match_cnpj.group(1).strip()
-            if "Nome/Razão Social:" in linha:
-                dados["razao_social"] = linha.split("Nome/Razão Social:")[1].strip()
-            if "Atividade Econômica" in linha:
-                break
+    padrao = (
+        r'Tomador\s*de\s*Servi[cç]o'
+        r'\s*(.*?)\s*'
+        r'Atividade'
+    )
+    match = re.search(padrao, texto, re.IGNORECASE | re.S)
+    if not match: return dados
+
+    bloco_completo = match.group(1).strip()
+
+    padrao = r'Nome/Raz[aâãáà]o\s*Social:'r'\s*(.*)$'
+    match = re.search(padrao, bloco_completo, re.IGNORECASE | re.M)
+    if match: dados["razao_social"] = match.group(1).strip()
+
+    padrao = r'CPF/CNPJ:\s*(.*?)\s*Inscri[cç][aâãáà]o'
+    match = re.search(padrao, bloco_completo, re.IGNORECASE | re.S)
+    if match: dados["cnpj"] = match.group(1).strip()
+
     return dados
 
-def pegar_discriminacao_servico(linhas):
-    descricao_linhas = []
-    dentro_da_secao = False
-    for linha in linhas:
-        if "Discriminação do Serviço" in linha:
-            dentro_da_secao = True
-            continue
-        if "Tributos Federais" in linha:
-            break
-        if dentro_da_secao:
-            linha_limpa = linha.strip()
-            descricao_linhas.append(linha_limpa)
-    texto_completo = "\n".join(descricao_linhas).strip()
-    return texto_completo if texto_completo else None
+def pegar_discriminacao_servico(texto):
+    padrao = (
+        r'Discrimina[cç][aâãáà]o\s*do\s*Servi[cç]o'
+        r'\s*(.*?)\s*'
+        r'Tributos\s*Federais'
+    )
+    match = re.search(padrao, texto, re.IGNORECASE | re.S)
+    if not match: return None
+    return match.group(1).strip()
 
-def pegar_valor_servico(linhas):
-    for linha in linhas:
-        if "Valor do Serviço" in linha:
-            match = re.search(r'Valor do Serviço\s+([\d.,]+)', linha)
-            if match:
-                return match.group(1).strip()
-    return "0,00"
-
-def pegar_valor_liquido(linhas):
-    for linha in linhas:
-        if "Valor Líquido" in linha:
-            match = re.search(r'Valor Líquido\s+([\d.,]+)', linha)
-            if match:
-                return match.group(1).strip()
-    return "0,00"
-
-def pegar_tributos_federais(linhas):
-    tributos = {
-        "pis": "0,00",
-        "cofins": "0,00",
-        "inss": "0,00",
-        "ir": "0,00",
-        "csll": "0,00"
+def pegar_valores(texto):
+    dados = {
+        "bruto": None, "liquido": None, 
+        "ir": None, "pis": None, "cofins": None, "csll": None,
+        "inss": None, "iss": None
     }
-    proxima_e_valor = False
-    for linha in linhas:
-        if "PIS" in linha and "COFINS" in linha and "CSLL" in linha:
-            proxima_e_valor = True
-            continue
-        if proxima_e_valor:
-            valores = re.findall(r'(\d{1,3}(?:\.\d{3})*,\d{2})', linha)
-            if len(valores) >= 5:
-                tributos["pis"] = valores[0]
-                tributos["cofins"] = valores[1]
-                tributos["inss"] = valores[2]
-                tributos["ir"] = valores[3]
-                tributos["csll"] = valores[4]
-            break     
-    return tributos
+    padrao = (
+        r'Tributos\s*Federais'
+        r'\s*(.*?)\s*'
+        r'Outras\s*Informa[cç][oõóòô]es'
+    )
+    match = re.search(padrao, texto, re.IGNORECASE | re.S)
+    if not match: return dados
+    
+    bloco_completo = match.group(1).strip()
 
-def pegar_issqn(linhas):
-    for linha in linhas:
-        if "ISSQN" in linha:
-            match = re.search(r'ISSQN\s+([\d.,]+)$|ISSQN\s+(\d{1,3}(?:\.\d{3})*,\d{2})', linha)
-            if match:
-                valor = match.group(1) if match.group(1) else match.group(2)
-                return valor.strip()
-    return "0,00"
+    padrao = r'Valor\s*do\s*Servi[cç]o'r'\s*(.*)$'
+    match = re.search(padrao, bloco_completo, re.IGNORECASE | re.M)
+    if match: dados["bruto"] = match.group(1).strip()
 
-def pegar_atividade_economica(linhas):
+    padrao = r'Valor\s*L[ií]quido'r'\s*(.*)$'
+    match = re.search(padrao, bloco_completo, re.IGNORECASE | re.M)
+    if match: dados["liquido"] = match.group(1).strip()
+
+    padrao = (
+        r'Municipal'
+        r'\s*(.*?)\s*'
+        r'Identifica[cç][aâãáà]o'
+    )
+    match = re.search(padrao, bloco_completo, re.IGNORECASE | re.S)
+    if match: 
+        texto = match.group(0)
+        linhas = texto.split('\n')
+        for i, texto_linha in enumerate(linhas):
+            if i == 1:
+                pis = texto_linha[1:9]
+                cofins = texto_linha[10:20]
+                inss = texto_linha[18:28]
+                ir = texto_linha[28:36]
+                csll = texto_linha[36:45]
+                dados["pis"] = pis.strip()
+                dados["cofins"] = cofins.strip()
+                dados["inss"] = inss.strip()
+                dados["ir"] = ir.strip()
+                dados['csll'] = csll.strip()
+
+    padrao = (
+        r'Nacional'
+        r'\s*(.*?)\s*'
+        r'ISSQN\s*a\s*Reter'
+    )
+    match = re.search(padrao, bloco_completo, re.IGNORECASE | re.S)
+    if match:
+        texto_iss = match.group(1)
+        padrao = r"ISSQN\s+([\d\.,]+)"
+        match = re.search(padrao, texto_iss)
+        if match: dados['iss'] = match.group(1).strip()
+    return dados
+
+def pegar_dados_servico(texto):
     dados = {
         "codigo":  None,
         "descricao_completa": None
     }
-    for i, linha in enumerate(linhas):
-        if "Atividade Econômica" in linha:
-            if i + 1 < len(linhas):
-                linha_alvo = linhas[i+1].strip()
-                dados["descricao_completa"] = linha_alvo
-                match_codigo = re.search(r'^([\d.]+)', linha_alvo)
-                if match_codigo:
-                    dados["codigo"] = match_codigo.group(1).strip()
-            break
+    padrao = (
+        r'Atividade\s*Econ[oõóòô]mica'
+        r'\s*(.*?)\s*'
+        r'Discrimina[cç][aâãáà]o\s*do\s*Servi[cç]o'
+    )
+    match = re.search(padrao, texto, re.IGNORECASE | re.S)
+    if not match: return dados
+    
+    bloco_completo = match.group(1).strip()
+    dados['descricao_completa'] = bloco_completo.strip()
+    
+    match = re.search(r'\s*(.*?)\s*/\s*', bloco_completo, re.IGNORECASE | re.M)
+    if match: dados["codigo"] = match.group(1).strip()
+    
     return dados
