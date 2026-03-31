@@ -15,6 +15,7 @@ from capture.municipio_barueri import leitura_municipio_barueri
 from capture.sigcorp import leitura_sgicorp
 from capture.lck_ibitinga import leitura_lck
 from capture.primaxonline import leitura_primax
+from capture.issnet import leitura_issnet
 
 if __name__ == "__main__":
     arquivos_pdf = listar_arquivos("download")
@@ -43,9 +44,10 @@ if __name__ == "__main__":
                 # r'S[eé]rie\s*RPS.*?Tipo\s*RPS': leitura_giss, # ok
                 # r'Nº\s*Nota\s+\d+.*?Nº\s*RPS:': leitura_giap, #ok
                 # r'Data\s*d[ao]\s*[DR]PS': leitura_issweb, #ok
-                r'N[uú]mero\s*do\s*RPS*?\s*No.\s*da\s*NFS-e\s*': leitura_ginfes,
+                # r'N[uú]mero\s*do\s*RPS*?\s*No.\s*da\s*NFS-e\s*': leitura_ginfes, #ok
+                # r'Natureza\s*da\s*Opera[cç][aâãáà]o*?\s*N[uú]mero\s*do\s*RPS\s*': leitura_issnet, #ok
+                r'Lei\s+nº\s+14\.097/2005': leitura_municipio_sao_paulo,
                 # r'senior\.com\.br|Gerado\s+por\s+eDocs': leitura_senior,
-                # r'Lei\s+nº\s+14\.097/2005': leitura_municipio_sao_paulo,
                 # r'Número\s+/\s+Série': leitura_municipio_sorocaba,
                 # r'barueri\.sp\.gov\.br/nfe': leitura_municipio_barueri,
                 # r'Cálculo\s+do\s+ISSQN\s+devido': leitura_sgicorp,
