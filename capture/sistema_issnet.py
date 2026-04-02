@@ -1,11 +1,12 @@
+
 import re
 from lib.limpar_cnpj import limpar_cnpj
 from lib.converter_moeda import extrair_valor
 
-def leitura_ginfes(texto: str):
-        
-    # print("----------- NOTA GINFES -----------")
-    # print(f"{texto}")
+def leitura_sistema_issnet(texto: str):
+
+    # print("----------- NOTA ISSNET -----------")
+    # print(texto)
     # print("-------------------------")
 
     prestador = pegar_dados_prestador(texto)
@@ -24,7 +25,7 @@ def leitura_ginfes(texto: str):
     nota["SERIE"] = "A" # Série do documento fiscal para registro. Fixo "A".
     nota["DTINSERT"] = None # Data da inclusão no SE Suite. Idem V_NF_SERV.
     nota["DTUPDATE"] = None # Data da alteração no SE Suite. Idem V_NF_SERV.
-    nota["ID_DOC"] = pegar_codigo_verificacao(texto) # ID do documento na view. Idem V_NF_SERV.
+    nota["ID_DOC"] = None # ID do documento na view. Idem V_NF_SERV.
     nota["PREFEIT"] = pegar_prefeitura(texto) # Nome da prefeitura. Idem V_NF_SERV.
     nota["SECRET_PREFEIT"] = pegar_secretaria(texto) # Secretaria da prefeitura. Idem V_NF_SERV.
     nota["NRO_NF"] = pegar_numero_nf(texto) # Número da NF. Idem V_NF_SERV.
@@ -52,38 +53,32 @@ def leitura_ginfes(texto: str):
     nota["VL_ISS"] = extrair_valor(financeiro["iss"]) # Valor do ISS. Idem V_NF_SERV.
     nota["COD_SERVICO"] = servico["codigo"] # Código do serviço. Idem V_NF_SERV.
     nota["COD_SERVICO_ORIGINAL"] = servico["descricao"] # Código do serviço - informação original. Idem V_NF_SERV.
-
+    
     print("----------- NOTA GINFES -----------")
     for chave, valor in nota.items():
         print(f"{chave}: {valor}")
     print("--------------------------------------")
-
-def pegar_codigo_verificacao(texto):
-    padrao = r'C[oóòõô]digo\s*de\s*Verifica[cç][aâãáà]o\s*(.*)$'
-    match = re.search(padrao, texto, re.I | re.M)
-    if not match: return None
-    return match.group(1).strip()
     
 def pegar_prefeitura(texto):
-    padrao = r'(PREFEITURA.*?)\s*N[uú]mero\s*'
+    padrao = r'(PREFEITURA.*?)\s{3}'
     match = re.search(padrao, texto, re.I | re.S)
     if not match: return None
     return match.group(1).strip()
 
 def pegar_secretaria(texto):
-    padrao = r'(SECRETARIA.*?)\s*NFS-e\s*'
+    padrao = r'(SECRETARIA.*?)\s{3}'
     match = re.search(padrao, texto, re.I | re.S)
     if not match: return None
     return match.group(1).strip()
 
 def pegar_numero_nf(texto):
-    padrao = r'SERVI[CÇ]O\s*-\s*NFS-e\s*(.*)$'
-    match = re.search(padrao, texto, re.I | re.M)
+    padrao = r'\s*(.*)\s\s(\d+)\s*Dados\s*do\s*Prestador\s*de\s*Servi[cç]o'
+    match = re.search(padrao, texto, re.I | re.S)
     if not match: return None
-    return match.group(1).strip()
+    return match.group(2).strip()
 
 def pegar_data_hora_emissao(texto):
-    padrao = r'Data\s*e\s*Hora\s*d[ae]\s*Emiss[aâãáà]o\s*(\d{2}/\d{2}/\d{4}).*?(\d{2}:\d{2}:\d{2})'
+    padrao = r'Data\s*de\s*Gera[cç][aâãáà]o\s*da\s*NFS-e\s*(\d{2}/\d{2}/\d{4}).*?(\d{2}:\d{2}:\d{2})'
     match = re.search(padrao, texto, re.I | re.S)
     if not match: return None
     data = match.group(1)
@@ -103,152 +98,192 @@ def pegar_dados_prestador(texto):
         "cep": None, 
         "email": None
     }
+
     padrao = (
         r'Prestador\s*de\s*Servi[cç]o'
         r'\s*(.*?)\s*'
-        r'Tomador\s*de\s*Servi[cç]o'
+        r'Identifica[cç][aâãáà]o\s*'
     )
     match = re.search(padrao, texto, re.IGNORECASE | re.S)
     if not match: return dados
     bloco_completo = match.group(1).strip()
 
-    padrao = r'Raz[aâãáà]oSocial/Nome\s*(.*)$'
-    match = re.search(padrao, bloco_completo, re.I | re.M)
-    if match: dados["razao_social"] = match.group(1).strip()
+    padrao = (
+        r'\s*\d{2}/\d{2}/\d{4}.*?\d{2}:\d{2}:\d{2}'
+        r'\s*(.*?)\s*'
+        r'Data\s*de\s*Compet[eêéè]ncia'
+    )
+    match = re.search(padrao, bloco_completo, re.I | re.S)
+    if match: dados['razao_social'] = match.group(1).strip()
 
     padrao = (
-        r'CNPJ/CPF\s*'
+        r'CPF/CNPJ'
         r'\s*(.*?)\s*'
-        r'\s*[iI]nscri[cç][aâãáà]o\s*Municipal\s*'
+        r'Respons[aâãáà]vel\s*pela\s*Reten[cç][aâãáà]o'
     )
-    match = re.search(padrao, bloco_completo)
-    if match: dados["cnpj"] = match.group(1).strip()
+    match = re.search(padrao, bloco_completo, re.I | re.S)
+    if match: dados['cnpj'] = match.group(1).strip()
 
     padrao = (
-        r'\s*[iI]nscri[cç][aâãáà]o\s*Municipal\s*'
+        r'Inscri[cç][aâãáà]o\s*Municipal'
         r'\s*(.*?)\s*'
-        r'Munic[ií]pio\s*'
+        r'-'
     )
+    match = re.search(padrao, bloco_completo, re.I | re.S)
+    if match: dados['inscricao_municipal'] = match.group(1).strip()
+
+    match = re.search(r'\d{5}-\d{3}', bloco_completo)
+    if match: dados["cep"] = match.group()
+
+    padrao = r'[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,}'
     match = re.search(padrao, bloco_completo)
-    if match: dados["inscricao_municipal"] = match.group(1).strip()
+    if match: dados["email"] = match.group().lower()
 
-    padrao = r'Munic[ií]pio\s*(.*?)\s*-\s*([A-Z]{2})$'
-    match = re.search(padrao, bloco_completo, re.I | re.M)
-    if match: 
-        dados["municipio"] = match.group(1).strip()
-        dados["uf"] = match.group(2).strip()
-
-    padrao = r'Endere[cç]o\s*e\s*CEP\s*(.*?)\s*-\s*(.*?)\s*CEP:\s*(\d{5}-\d{3})'
+    padrao = (
+        r'Data\s*de\s*Compet[eêéè]ncia'
+        r'\s*(.*?)\s*'
+        r'-'
+    )
     match = re.search(padrao, bloco_completo, re.I | re.S)
     if match: 
         endereco = match.group(1).strip()
-        dados["bairro"] = match.group(2).strip()
-        dados['cep'] = match.group(3).strip()
-
-    padrao = r'Complemento \s*(.*?)\s*Telefone\s*'
+        padrao = r'\d{2}/\d{2}/\d{4}'
+        end = re.sub(padrao, '', endereco)
+        end = " ".join(end.split())
+        dados['endereco'] = end
+        
+    padrao = (
+        r'Data\s*de\s*Compet[eêéè]ncia'
+        r'\s*.*?\s*'
+        r'-'
+        r'\s*(.*?)\s*'
+        r'\s*CEP\s*'
+    )
     match = re.search(padrao, bloco_completo, re.I | re.S)
-    if match: complemento = match.group(1).strip()
+    if match: 
+        sujeira = [
+            r'C[oóõôò]d.\s*de\s*Autenticidade',
+            r'\d{2}/\d{2}/\d{4}',              # Datas, se houver
+        ]
+        texto_limpo = match.group(1).strip()
+        for termo in sujeira:
+            texto_limpo = re.sub(termo, '', texto_limpo, flags=re.I | re.S)
+        dados['bairro'] =  re.sub(r'\s+', '', texto_limpo)
 
-    dados['endereco'] = f'{endereco}'
-    if complemento: dados['endereco'] = f'{dados['endereco']}, {complemento}'
-
-    padrao = r'\s*e-mail\s*(.*)$'
-    match = re.search(padrao, bloco_completo, re.I | re.M)
-    if match: dados["email"] = match.group(1).strip()
-
-    padrao = r'\s*e-mail\s*(.*)$'
-    match = re.search(padrao, bloco_completo, re.I | re.M)
-    if match: dados["email"] = match.group(1).strip()
+            
+    padrao = r'-\s*([^-\/]+)\s*\/([A-Z]{2})'
+    match = re.search(padrao, bloco_completo, re.I | re.S)
+    if match: 
+        dados['municipio'] = match.group(1).strip()
+        dados['uf'] = match.group(2).strip()
 
     return dados
 
 def pegar_dados_tomador(texto):
-    dados = {"cnpj": None, "razao_social": None}
+    dados = {"razao_social": None, "cnpj": None}
+
     padrao = (
         r'Tomador\s*de\s*Servi[cç]o'
         r'\s*(.*?)\s*'
-        r'Discrimina[cç][aâãáà]o\s*do\s*Servi[cç]o'
+        r'Dados\s*do\s*Intermedi[aâãáà]rio'
     )
     match = re.search(padrao, texto, re.I | re.S)
     if not match: return dados
     bloco_completo = match.group(1).strip()
 
-    padrao = r'Raz[aâãáà]oSocial/Nome\s*(.*)$'
+    padrao = (
+        r'Raz[aâãáà]o\s*Social\s*:?'
+        r'\s*(.*?)$'
+    )
     match = re.search(padrao, bloco_completo, re.I | re.M)
-    if match: dados["razao_social"] = match.group(1).strip()
-
-    dados["cnpj"] = bloco_completo
+    if  match: dados['razao_social'] = match.group(1).strip()
 
     padrao = (
-        r'\s*CNPJ/CPF\s*'
+        r'CNPJ/CPF\s*:'
         r'\s*(.*?)\s*'
-        r'\s*[iI]nscri[cç][aâãáà]o\s*Municipal\s*'
+        r'IM\s*'
     )
     match = re.search(padrao, bloco_completo, re.I | re.S)
-    if match: dados["cnpj"] = match.group(1).strip()
+    if  match: dados['cnpj'] = match.group(1).strip()
 
     return dados
 
 def pegar_discriminacao_servico(texto):
     padrao = (
-        r'Discrimina[cç][aâãáà]o\s*do\s*Servi[cç]o'
+        r'Descri[cç][aâãáà]o\s*dos\s*Serviços'
         r'\s*(.*?)\s*'
-        r'C[oóòõô]digo\s*do\s*Servi[cç]o\s*'
+        r'Detalhamento\s*dos\s*Tributos'
     )
     match = re.search(padrao, texto, re.S | re.I)
     if not match: return None
     return match.group(1).strip()
 
+
 def pegar_valores(texto):
     dados = {
-        "pis": None, "cofins": None, "csll": None, 
-        "ir": None, "inss": None, "iss": None, 
-        "bruto": None, "liquido": None
+        "bruto": None, "liquido": None, 
+        "ir": None, "pis": None, "cofins": None, "csll": None,
+        "inss": None, "iss": None
     }
     padrao = (
-        r'Tributos\s*Federais\s*(.*+)'
+        r'\s*Desconto\sCondicionado\s*'
+        r'\s*(.*?)\s*'
+        r'PIS\s*'
     )
     match = re.search(padrao, texto, re.I | re.S)
-    if not match: return dados
-    bloco_completo = match.group(1)
+    if match: 
+        bloco_valor_bruto = match.group(1).strip()
+        padrao = r"[\d\.,]+"
+        valores = re.findall(padrao, bloco_valor_bruto)
+        dados['bruto'] = valores[0].strip()
 
     padrao = (
-        r'PIS\s*\(R\$\)\s*(.*?)\s*COFINS\s*\(R\$\)\s*(.*?)\s*IR\s*\(R\$\)\s*(.*?)\s*INSS\s*\(R\$\)\s*(.*?)\s*CSLL\s*\(R\$\)\s*(.*?)'
+        r'\s*V[LIli]\.?\s*L[ií]quido\s*da\s*Nota\s*Fiscal\s*'
+        r'\s*(.*?)\s*'
+        r'Constru[cç][aâãáà]o\s*Civil\s*'
     )
-    match = re.search(padrao, bloco_completo, re.I | re.S)
+    match = re.search(padrao, texto, re.I | re.S)
     if match: 
-        dados["pis"] = match.group(1).strip()
-        dados["cofins"] = match.group(2).strip()
-        dados["ir"] = match.group(3).strip()
-        dados["inss"] = match.group(4).strip()
-        dados["csll"] = match.group(5).strip()
-
-    padrao = r'Valor\s*do\s*Servi[cç]o\s*R\$\s*(.*?)\s*Natureza\s*'
-    match = re.search(padrao, bloco_completo, re.I | re.S)
-    if match: dados['bruto'] = match.group(1).strip()
-
-    padrao = r'Valor\s*L[ií]quido\s*R\$\s*(.*?)\s*\(=\)\s*'
-    match = re.search(padrao, bloco_completo, re.I | re.S)
-    if match: dados['liquido'] = match.group(1).strip()
-
-    padrao = r'ISSQN\s*R\$\s*([0-9.,]*)'
-    match = re.search(padrao, bloco_completo, re.I | re.S)
-    if match: dados['iss'] = match.group(1).strip()
-
+        bloco_valor_restante = match.group(1).strip()
+        padrao = r"[\d\.,]+"
+        valores = re.findall(padrao, bloco_valor_restante)
+        dados['pis'] = valores[0].strip()
+        dados['cofins'] = valores[1].strip()
+        dados['ir'] = valores[3].strip()
+        dados['inss'] = valores[2].strip()
+        dados['csll'] = valores[4].strip()
+        dados['iss'] = valores[-2].strip()
+        dados['liquido'] = valores[-1].strip()
     return dados
 
 def pegar_dados_servico(texto):
-    dados = {"codigo": None, "descricao": None}
+    dados = {
+        "codigo": None,
+        "descricao": None,
+    }
     padrao = (
-        r'C[oóòõô]digo\s*do\s*Servi[cç]o\s*\/\s*Atividade'
+        r'C[oóòõô]d.\s*CNAE\s*'
         r'\s*(.*?)\s*'
-        r'Detalhamento\s*'
+        r'\s*Total\s*dos\s*Servi[cç]os\s*'
     )
-    match = re.search(padrao, texto, re.S | re.I)
-    if match: 
-        descricao = match.group(1).strip() 
-        match = re.search(r'\s*(.*?)\s*\/\s*', descricao, re.IGNORECASE | re.M)
-        if match: dados["codigo"] = match.group(1).strip()
-        dados['descricao'] = descricao
-        
+    match = re.search(padrao, texto, re.I | re.S)
+    if not match: return dados
+    bloco_completo = match.group(1).strip()
+    
+    padrao = r"(.*?)\s[\d\.,]+"
+    match = re.search(padrao, bloco_completo)
+    if not match: return dados
+    descricao = match.group(1).strip()
+    dados['descricao'] = descricao
+
+    padrao = r"(.*?)\s*-"
+    match = re.search(padrao, descricao)
+    if not match: return dados
+
+    codigo = match.group(1).strip()
+    codigo = codigo.zfill(6)
+
+    codigo = f"{codigo[:2]}.{codigo[2:4]}"
+    dados['codigo'] = codigo
+    
     return dados

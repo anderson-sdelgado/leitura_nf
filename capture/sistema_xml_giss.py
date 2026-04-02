@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from lib.limpar_cnpj import limpar_cnpj, formatar_cnpj # Importe a nova função
 
-def leitura_xml_giss(caminho_xml: str):
+def leitura_sistema_xml_giss(caminho_xml: str):
     try:
         tree = ET.parse(caminho_xml)
         root = tree.getroot()

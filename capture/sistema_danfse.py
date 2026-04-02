@@ -3,7 +3,7 @@ from lib.leitura_arquivo import ler_pymupedf
 from lib.limpar_cnpj import limpar_cnpj
 from lib.converter_moeda import extrair_valor
 
-def leitura_danfse(texto: str):
+def leitura_sistema_danfse(texto: str):
     
     # print("----------- NOTA DANFSE -----------")
     # print(texto)
@@ -20,30 +20,30 @@ def leitura_danfse(texto: str):
     nota["DT_HR_ALT"] = None # Data e hora da alteração da linha.
     nota["CDDOCUMENT"] = None # Código do documento no SE Suite. Idem V_NF_SERV.
     nota["NRO_CHAVE"] = None # Chave para registro da NFs-e. Gerada na integração.
-    nota["CPF_CNPJ_EMIT"] = limpar_cnpj(tomador['cnpj']) # CNPJ/CPF da empresa (tomador) - somente números. Vide V_NF_SERV.TS_CNPJ_CPF. ok
-    nota["COD_PART"] = limpar_cnpj(prestador['cnpj']) # CNPJ/CPF do fornecedor (prestador) - somente números. Vide V_NF_SERV.PS_CNPJ_CPF. ok
+    nota["CPF_CNPJ_EMIT"] = limpar_cnpj(tomador['cnpj']) # CNPJ/CPF da empresa (tomador) - somente números. Vide V_NF_SERV.TS_CNPJ_CPF.
+    nota["COD_PART"] = limpar_cnpj(prestador['cnpj']) # CNPJ/CPF do fornecedor (prestador) - somente números. Vide V_NF_SERV.PS_CNPJ_CPF.
     nota["COD_MOD"] = "99" # Código do modelo de documento fiscal para registro. Fixo "99".
     nota["SERIE"] = "A" # Série do documento fiscal para registro. Fixo "A".
     nota["DTINSERT"] = None # Data da inclusão no SE Suite. Idem V_NF_SERV.
     nota["DTUPDATE"] = None # Data da alteração no SE Suite. Idem V_NF_SERV.
-    nota["ID_DOC"] = pegar_chave_acesso(texto) # ID do documento na view. Idem V_NF_SERV. ok
-    nota["PREFEIT"] = prefeitura['prefeitura'] # Nome da prefeitura. Idem V_NF_SERV. ok
-    nota["SECRET_PREFEIT"] = prefeitura['secretaria'] # Secretaria da prefeitura. Idem V_NF_SERV. ok
-    nota["NRO_NF"] = pegar_numero_nota(texto) # Número da NF. Idem V_NF_SERV. ok
-    nota["DT_EMISS"] = pegar_data_hora_emissao(texto) # Data de emissão da NF. Idem V_NF_SERV. ok
-    nota["PS_RAZ_SOC_NOME"] = prestador['razao_social'] # Nome do prestador de serviço. Idem V_NF_SERV. ok
-    nota["PS_CNPJ_CPF"] = prestador['cnpj'] # CNPJ do prestador de serviço. Idem V_NF_SERV. ok
-    nota["PS_INSC_MUNIC"] = prestador['inscricao_municipal'] # Inscrição municipal do prestador de serviço. Idem V_NF_SERV. ok
-    nota["PS_INSC_EST"] = None # Inscrição estadual do prestador de serviço. Idem V_NF_SERV. ok
-    nota["PS_MUNIC"] = prestador['municipio'] # Nome do município do prestador de serviço. Idem V_NF_SERV. ok
-    nota["PS_UF"] = prestador['uf'] # Sigla da UF do prestador de serviço. Idem V_NF_SERV. ok
-    nota["PS_ENDERECO"] = prestador['endereco'] # Endereço do prestador de serviço. Idem V_NF_SERV. ok
-    nota["PS_BAIRRO"] = prestador['bairro'] # Bairro do prestador de serviço. Idem V_NF_SERV. ok
-    nota["PS_CEP"] = prestador['cep'] # CEP do prestador de serviço. Idem V_NF_SERV. ok
-    nota["PS_EMAIL"] = prestador['email'] # E-mail do prestador de serviço. Idem V_NF_SERV. ok
-    nota["TS_RAZ_SOC_NOME"] = tomador['razao_social'] # Nome do tomador de serviço - empresa usuária. Idem V_NF_SERV. ok
-    nota["TS_CNPJ_CPF"] = tomador['cnpj'] # CNPJ do tomador de serviço - empresa usuária. Idem V_NF_SERV. ok ok
-    nota["DESC_SERV"] = servico['discriminacao'] # Descrição do serviço. Idem V_NF_SERV. ok
+    nota["ID_DOC"] = pegar_chave_acesso(texto) # ID do documento na view. Idem V_NF_SERV.
+    nota["PREFEIT"] = prefeitura['prefeitura'] # Nome da prefeitura. Idem V_NF_SERV.
+    nota["SECRET_PREFEIT"] = prefeitura['secretaria'] # Secretaria da prefeitura. Idem V_NF_SERV.
+    nota["NRO_NF"] = pegar_numero_nota(texto) # Número da NF. Idem V_NF_SERV.
+    nota["DT_EMISS"] = pegar_data_hora_emissao(texto) # Data de emissão da NF. Idem V_NF_SERV.
+    nota["PS_RAZ_SOC_NOME"] = prestador['razao_social'] # Nome do prestador de serviço. Idem V_NF_SERV.
+    nota["PS_CNPJ_CPF"] = prestador['cnpj'] # CNPJ do prestador de serviço. Idem V_NF_SERV.
+    nota["PS_INSC_MUNIC"] = prestador['inscricao_municipal'] # Inscrição municipal do prestador de serviço. Idem V_NF_SERV.
+    nota["PS_INSC_EST"] = None # Inscrição estadual do prestador de serviço. Idem V_NF_SERV.
+    nota["PS_MUNIC"] = prestador['municipio'] # Nome do município do prestador de serviço. Idem V_NF_SERV.
+    nota["PS_UF"] = prestador['uf'] # Sigla da UF do prestador de serviço. Idem V_NF_SERV.
+    nota["PS_ENDERECO"] = prestador['endereco'] # Endereço do prestador de serviço. Idem V_NF_SERV.
+    nota["PS_BAIRRO"] = prestador['bairro'] # Bairro do prestador de serviço. Idem V_NF_SERV.
+    nota["PS_CEP"] = prestador['cep'] # CEP do prestador de serviço. Idem V_NF_SERV.
+    nota["PS_EMAIL"] = prestador['email'] # E-mail do prestador de serviço. Idem V_NF_SERV.
+    nota["TS_RAZ_SOC_NOME"] = tomador['razao_social'] # Nome do tomador de serviço - empresa usuária. Idem V_NF_SERV.
+    nota["TS_CNPJ_CPF"] = tomador['cnpj'] # CNPJ do tomador de serviço - empresa usuária. Idem V_NF_SERV.
+    nota["DESC_SERV"] = servico['discriminacao'] # Descrição do serviço. Idem V_NF_SERV.
     nota["VL_BRUTO"] = extrair_valor(financeiro["bruto"]) # Valor bruto. Idem V_NF_SERV. 
     nota["VL_LIQ"] = extrair_valor(financeiro["liquido"]) # Valor líquido. Idem V_NF_SERV.
     nota["VL_PIS"] = extrair_valor(financeiro["pis"]) # Valor do PIS. Idem V_NF_SERV.

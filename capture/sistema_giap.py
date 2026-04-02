@@ -2,7 +2,7 @@ import re
 from lib.limpar_cnpj import limpar_cnpj
 from lib.converter_moeda import extrair_valor
 
-def leitura_giap(texto: str):
+def leitura_sistema_giap(texto: str):
 
     # print("----------- NOTA GIAP -----------")
     # print(f"{texto}")
@@ -122,16 +122,13 @@ def pegar_dados_prestador(texto):
     match = re.search(padrao, bloco_completo, re.I | re.S)
     if match: dados["cnpj"] = match.group(1).strip()
 
-    padrao = r'Insc\.\s*Municipal:\s*(.*?)\s*Insc\s*'
+    padrao = r'Insc(?:i[cç][aâãáà]o|\.)\s*Municipal:\s*(.*?)\s*Insc\s*'
     match = re.search(padrao, bloco_completo, re.I | re.S)
     if match: dados["inscricao_municipal"] = match.group(1).strip()
     
-    padrao = r'Insc\.\s*Estadual:\s*(\S+)'
-    match = re.search(padrao, bloco_completo, re.I)
-    texto_limpo = match.group(1)
-    if match:
-        texto_limpo = re.sub(r'Endere[cç]o:', '', texto_limpo, flags=re.I | re.S)
-        if texto_limpo: dados["inscricao_estadual"] = texto_limpo.strip()
+    padrao = r'Insc(?:i[cç][aâãáà]o|\.)\s*Estadual:\s*(.*)$'
+    match = re.search(padrao, bloco_completo, re.I | re.M)
+    if match: dados["inscricao_estadual"] = match.group(1).strip()
 
     padrao = r'Endere[cç]o:\s*(.*)$'
     match = re.search(padrao, bloco_completo, re.I | re.M)
@@ -177,7 +174,6 @@ def pegar_dados_tomador(texto):
     if not match: return dados
     
     bloco_completo = match.group(1)
-    dados = {}
     
     padrao = r'Raz[aâãáà]o\s*Social/Nome:\s*(.*)$'
     match = re.search(padrao, bloco_completo, re.I | re.M)

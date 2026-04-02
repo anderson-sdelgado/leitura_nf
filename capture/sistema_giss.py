@@ -5,7 +5,7 @@ from lib.converter_moeda import extrair_valor
 def limpar_linha(linha):
     return re.sub(r'^\d+:\s*', '', linha).strip()
 
-def leitura_giss(texto: str):
+def leitura_sistema_giss(texto: str):
         
     # print("----------- NOTA GISS -----------")
     # print(texto)

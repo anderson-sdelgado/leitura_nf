@@ -3,7 +3,7 @@ import re
 from lib.limpar_cnpj import limpar_cnpj
 from lib.converter_moeda import extrair_valor
 
-def leitura_issweb(texto: str):
+def leitura_sistema_issweb(texto: str):
 
     # print("----------- NOTA ISSWEB -----------")
     # print(texto)

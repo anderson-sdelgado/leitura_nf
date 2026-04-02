@@ -1,21 +1,18 @@
 import re
 from lib.leitura_pasta import listar_arquivos
 from lib.leitura_arquivo import ler_pdfplumber
-from capture.danfse import leitura_danfse
-from capture.giss import leitura_giss
-from capture.nota_desconhecida import leitura_desconhecida
-from capture.giap import leitura_giap
+from capture.sistema_xml_giss import leitura_sistema_xml_giss
+from capture.sistema_danfse import leitura_sistema_danfse
+from capture.sistema_giap import leitura_sistema_giap
+from capture.sistema_ginfes import leitura_sistema_ginfes
+from capture.sistema_giss import leitura_sistema_giss
+from capture.sistema_issnet import leitura_sistema_issnet
+from capture.sistema_issweb import leitura_sistema_issweb
+from capture.sistema_primax import leitura_sistema_primax
+from capture.sistema_sigissweb import leitura_sistema_sigissweb
+from capture.sistema_atende_net import leitura_sistema_atende_net
 from capture.municipio_sao_paulo import leitura_municipio_sao_paulo
-from capture.senior import leitura_senior
-from capture.ginfes import leitura_ginfes
-from capture.issweb import leitura_issweb
-from capture.municipo_sorocaba import leitura_municipio_sorocaba
-from capture.giss_xml import leitura_xml_giss
-from capture.municipio_barueri import leitura_municipio_barueri
-from capture.sigcorp import leitura_sgicorp
-from capture.lck_ibitinga import leitura_lck
-from capture.primaxonline import leitura_primax
-from capture.issnet import leitura_issnet
+from capture.nota_desconhecida import leitura_desconhecida
 
 if __name__ == "__main__":
     arquivos_pdf = listar_arquivos("download")
@@ -40,19 +37,16 @@ if __name__ == "__main__":
                 continue
 
             identificadores = {
-                # r'DANFSe\s*v1.0': leitura_danfse, # ok
-                # r'S[eé]rie\s*RPS.*?Tipo\s*RPS': leitura_giss, # ok
-                # r'Nº\s*Nota\s+\d+.*?Nº\s*RPS:': leitura_giap, #ok
-                # r'Data\s*d[ao]\s*[DR]PS': leitura_issweb, #ok
-                # r'N[uú]mero\s*do\s*RPS*?\s*No.\s*da\s*NFS-e\s*': leitura_ginfes, #ok
-                # r'Natureza\s*da\s*Opera[cç][aâãáà]o*?\s*N[uú]mero\s*do\s*RPS\s*': leitura_issnet, #ok
-                r'Lei\s+nº\s+14\.097/2005': leitura_municipio_sao_paulo,
-                # r'senior\.com\.br|Gerado\s+por\s+eDocs': leitura_senior,
-                # r'Número\s+/\s+Série': leitura_municipio_sorocaba,
-                # r'barueri\.sp\.gov\.br/nfe': leitura_municipio_barueri,
-                # r'Cálculo\s+do\s+ISSQN\s+devido': leitura_sgicorp,
-                # r'LCK\s+Consultoria\s+e\s+Sistemas': leitura_lck,
-                # r'No\.\s+Controle.*?Chave\s+de\s+Segurança|www\.primaxonline\.com\.br': leitura_primax,
+                # r'DANFSe\s*v1.0': leitura_sistema_danfse, # ok
+                # r'Nº\s*Nota\s+\d+.*?Nº\s*RPS:': leitura_sistema_giap, #ok
+                # r'N[uú]mero\s*do\s*RPS*?\s*No.\s*da\s*NFS-e\s*': leitura_sistema_ginfes, #ok
+                # r'S[eé]rie\s*RPS.*?Tipo\s*RPS': leitura_sistema_giss, # ok
+                # r'Natureza\s*da\s*Opera[cç][aâãáà]o*?\s*N[uú]mero\s*do\s*RPS\s*': leitura_sistema_issnet, #ok
+                # r'Data\s*d[ao]\s*[DR]PS': leitura_sistema_issweb, #ok
+                # r'No\.\s+Controle.*?Chave\s+de\s+Segurança|www\.primaxonline\.com\.br': leitura_sistema_primax, #ok
+                # r'N[uúùû]mero\s*e\s*S[eéèê]rie\s*do\s*RPS': leitura_sistema_sigissweb, #ok
+                r'\s*atende.net\s*': leitura_sistema_atende_net,
+                # r'Lei\s+nº\s+14\.097/2005': leitura_municipio_sao_paulo, #ok
             }
             nota_processada = False
             
