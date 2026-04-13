@@ -218,7 +218,6 @@ def pegar_discriminacao_servico(texto):
     if not match: return None
     return match.group(1).strip()
 
-
 def pegar_valores(texto):
     dados = {
         "bruto": None, "liquido": None, 

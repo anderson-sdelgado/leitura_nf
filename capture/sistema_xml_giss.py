@@ -28,7 +28,6 @@ def leitura_sistema_xml_giss(caminho_xml: str):
             "3550308": "SAO PAULO"
         }
 
-
         endereco_base = inf_nfse.find('.//ns:PrestadorServico//ns:Endereco', namespaces=ns)
         rua = endereco_base.findtext('ns:Endereco', namespaces=ns) # Rua Tambaú
         numero = endereco_base.findtext('ns:Numero', namespaces=ns)
